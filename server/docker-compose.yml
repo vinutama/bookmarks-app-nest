@@ -5,11 +5,10 @@ services:
   bookmark-db:
     image: postgres:11-alpine
     ports:
-      - 5433:5432
+      - 5434:5432
     environment:
       - POSTGRES_USER=bookmark
       - POSTGRES_PASSWORD=password
-      - POSTGRES_HOST=bookmark-db
       - POSTGRES_DB=bookmark-db
     networks:
       - bmknet
