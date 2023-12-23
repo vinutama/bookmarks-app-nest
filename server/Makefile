@@ -15,3 +15,8 @@ check-db:
 
 migrate-db:
 	npx prisma migrate dev
+
+restart-db:
+	docker compose rm bookmark-db -s -f -v && \
+	docker compose up bookmark-db -d && \
+	sleep 1 && npx prisma migrate deploy
