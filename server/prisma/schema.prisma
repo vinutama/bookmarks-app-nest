@@ -15,11 +15,12 @@ model Users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email    String
+  email    String @unique
   password String
 
   firstName String?
   lastName  String?
+  Bookmarks Bookmarks[]
 }
 
 model Bookmarks {
@@ -31,4 +32,8 @@ model Bookmarks {
   description String?
   link        String
   category    String  @default("general")
+
+  // create relation with user
+  userId Int
+  user   Users @relation(fields: [userId], references: [id])
 }
