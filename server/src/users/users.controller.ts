@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { Users } from '@prisma/client';
-import { JwtGuard } from 'src/auth/guard';
-import { GetUserLogin } from 'src/custom-decorators';
+import { GetUserLogin } from '../../src/custom-decorators';
+import { JwtGuard } from '../auth/guard/jwt.guard';
 
 //use guard from wrap authorization
 // it can be in controller level or route level
