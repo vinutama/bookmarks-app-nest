@@ -35,5 +35,5 @@ model Bookmarks {
 
   // create relation with user
   userId Int
-  user   Users @relation(fields: [userId], references: [id])
+  user   Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
