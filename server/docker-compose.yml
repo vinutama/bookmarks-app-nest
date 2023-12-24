@@ -12,5 +12,16 @@ services:
       - POSTGRES_DB=bookmark-db
     networks:
       - bmknet
+  test-db:
+    image: postgres:11-alpine
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_USER=bookmark
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=test-db
+    networks:
+      - bmknet
+
 networks:
   bmknet:
