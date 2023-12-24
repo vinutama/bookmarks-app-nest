@@ -18,9 +18,23 @@ model Users {
   email    String @unique
   password String
 
-  firstName String?
-  lastName  String?
+  firstName  String?
+  lastName   String?
+  Bookmarks  Bookmarks[]
+  Categories Categories[]
+}
+
+model Categories {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
   Bookmarks Bookmarks[]
+
+  // create relation with user
+  userId Int
+  user   Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Bookmarks {
@@ -31,9 +45,11 @@ model Bookmarks {
   title       String
   description String?
   link        String
-  category    String  @default("general")
 
   // create relation with user
   userId Int
   user   Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId Int?
+  category   Categories? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }

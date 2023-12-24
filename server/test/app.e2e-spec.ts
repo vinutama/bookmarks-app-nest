@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
 import { AppModule } from '../src/app.module';
 import { AuthDto } from "../src/auth/dto";
+import { CreateBookmarkDto } from '../src/bookmarks/dto';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EditUserDto } from '../src/users/dto/edit-user.dto';
 
@@ -95,7 +96,23 @@ describe('App e2e', () => {
 
   describe('Bookmarks', () => {
     describe('Create bookmark', () => {
-      it.todo('create bookmark here');
+      it('create bookmark', () => {
+        const payload: CreateBookmarkDto = {
+          link: 'https://github.com',
+          title: 'Github',
+        };
+        return pactum
+          .spec()
+          .post('/bookmarks')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .withBody(payload)
+          .expectStatus(201)
+          .expectBodyContains(payload.link)
+          .expectBodyContains(payload.title)
+          .inspect()
+      });
     });
 
     describe('Get bookmarks', () => {
