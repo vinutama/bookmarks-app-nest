@@ -62,14 +62,12 @@ export class BookmarksService {
             delete updatedBookmarkData.categoryId;
         };
         
-        console.log("INI >>>>", updatedBookmarkData)
         const updatedBookmark = await this.prisma.bookmarks.update({
             where: {
                 id, userId
             },
             data: { ... updatedBookmarkData }
         })
-        console.log("INIRESULT >>>>", updatedBookmark)
 
         return updatedBookmark;
     }
