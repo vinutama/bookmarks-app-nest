@@ -1,17 +1,20 @@
 create-module:
-	nest g module ${name}
+	nest g module ${name} --no-spec
 
 create-controller:
-	nest g controller ${name}
+	nest g controller ${name} --no-spec
 
 create-service:
-	nest g service ${name}
+	nest g service ${name} --no-spec
 
 up-db:
 	docker compose up -d
 
 check-db:
 	docker exec -it server-bookmark-db-1 psql -U bookmark -d bookmark-db
+
+check-test-db:
+	docker exec -it server-test-db-1 psql -U bookmark -d test-db
 
 migrate-db:
 	npx prisma migrate dev
