@@ -1,2 +1,12 @@
 # bookmarks-app-nest
-Create bookmarks using Nest JS
+Create bookmarks APP
+
+# Backend
+- Framework: NestJS (TypeScript built-in)
+- TDD: PactumJS
+- Docker
+- ORM: Prisma.io
+
+# Frontend
+- TBD
+
