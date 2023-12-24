@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookmarkDto, EditBookmarkDto } from './dto';
 
@@ -35,7 +35,7 @@ export class BookmarksService {
     }
 
     async getBookmarkDetails(userId: number, id: number) {
-        return await this.prisma.bookmarks.findFirst({
+        const result = await this.prisma.bookmarks.findFirst({
             where: {
                 id, userId
             },
@@ -46,14 +46,16 @@ export class BookmarksService {
                     }
                 }
             }
-        });
+        }); 
+        return {message: 'Bookmark details retrieved', ...result};
     }
 
     async editBookmark(userId: number, id: number, dto: EditBookmarkDto) {
         const bookmark = await this.prisma.bookmarks.findFirst({
-            where: {id, userId}
-        })
+            where: {id}
+        });
         if (!bookmark) throw new NotFoundException('Bookmark does not exist!');
+        if (bookmark.userId != userId) throw new ForbiddenException('Resource denied');
         
         const updatedBookmarkData: any = { ...dto };
 
@@ -67,8 +69,23 @@ export class BookmarksService {
                 id, userId
             },
             data: { ... updatedBookmarkData }
-        })
+        });
 
         return updatedBookmark;
     }
+
+    async deleteBookmark(userId: number, id: number) {
+        const bookmark = await this.prisma.bookmarks.findFirst({
+            where: {id}
+        });
+        if (!bookmark) throw new NotFoundException('Bookmark does not exist!');
+        if (bookmark.userId != userId) throw new ForbiddenException('Resource denied');
+
+        return await this.prisma.bookmarks.delete({
+            where: {
+                id
+            }
+        });
+    }
+
 }

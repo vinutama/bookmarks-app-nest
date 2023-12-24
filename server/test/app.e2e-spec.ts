@@ -240,7 +240,27 @@ describe('App e2e', () => {
     });
 
     describe('Delete bookmark', () => {
-      it.todo('Delete bookmark here');
+      it('delete the bookmark 2', async () => {
+        return pactum
+          .spec()
+          .delete('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId2}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(204)
+      });
+
+      it('should get only 1 left bookmark', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(200)
+          .expectJsonLength(1)
+      });
     });
   });
 })
