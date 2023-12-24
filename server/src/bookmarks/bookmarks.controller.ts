@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUserLogin } from '../custom-decorators';
 import { BookmarksService } from './bookmarks.service';
-import { CreateBookmarkDto } from './dto';
+import { CreateBookmarkDto, EditBookmarkDto } from './dto';
 
 @UseGuards(JwtGuard)
 @Controller('bookmarks')
@@ -30,7 +30,14 @@ export class BookmarksController {
         return this.bookmarkService.getBookmarkDetails(userId, id);
     }
 
-    editBookmark() {}
+    @Patch(':bookmarkId')
+    editBookmark(
+        @GetUserLogin('id') userId: number,
+        @Param('bookmarkId', ParseIntPipe) id: number,
+        @Body() dto: EditBookmarkDto
+    ) {
+        return this.bookmarkService.editBookmark(userId, id, dto);
+    }
 
     deleteBookmark() {}
 }

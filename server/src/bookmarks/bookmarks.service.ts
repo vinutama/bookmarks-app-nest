@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateBookmarkDto } from './dto';
+import { CreateBookmarkDto, EditBookmarkDto } from './dto';
 
 @Injectable()
 export class BookmarksService {
@@ -47,5 +47,30 @@ export class BookmarksService {
                 }
             }
         });
+    }
+
+    async editBookmark(userId: number, id: number, dto: EditBookmarkDto) {
+        const bookmark = await this.prisma.bookmarks.findFirst({
+            where: {id, userId}
+        })
+        if (!bookmark) throw new NotFoundException('Bookmark does not exist!');
+        
+        const updatedBookmarkData: any = { ...dto };
+
+        if (dto.categoryId) {
+            updatedBookmarkData.category = {connect: {id: Number(dto.categoryId)}};
+            delete updatedBookmarkData.categoryId;
+        };
+        
+        console.log("INI >>>>", updatedBookmarkData)
+        const updatedBookmark = await this.prisma.bookmarks.update({
+            where: {
+                id, userId
+            },
+            data: { ... updatedBookmarkData }
+        })
+        console.log("INIRESULT >>>>", updatedBookmark)
+
+        return updatedBookmark;
     }
 }

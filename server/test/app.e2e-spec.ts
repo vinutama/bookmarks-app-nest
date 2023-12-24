@@ -4,7 +4,7 @@ import * as pactum from 'pactum';
 import { CategoryDto } from 'src/categories/dto';
 import { AppModule } from '../src/app.module';
 import { AuthDto } from "../src/auth/dto";
-import { CreateBookmarkDto } from '../src/bookmarks/dto';
+import { CreateBookmarkDto, EditBookmarkDto } from '../src/bookmarks/dto';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EditUserDto } from '../src/users/dto/edit-user.dto';
 
@@ -132,7 +132,7 @@ describe('App e2e', () => {
           .expectStatus(201)
           .expectBodyContains(payload.link)
           .expectBodyContains(payload.title)
-          .stores('bookmarkId', 'id');
+          .stores('bookmarkId', 'id')
       });
 
       it('create bookmark without category', () => {
@@ -196,7 +196,47 @@ describe('App e2e', () => {
     });
 
     describe('Edit bookmark', () => {
-      it.todo('Edit bookmark here');
+      it('should edit link and category bookmark', async () => {
+        const payloadCategory: CategoryDto = {
+          name: 'EditedMain'
+        };
+        const categoryId2 = await pactum.spec().post('/categories')
+        .withHeaders({
+          Authorization: 'Bearer $S{userHeaders}'
+        })
+        .withBody(payloadCategory)
+        .returns('id');
+  
+        const payload: EditBookmarkDto = {
+          title: 'EditedTitle',
+          link: 'https://gitlab.com'
+        };
+        return pactum
+          .spec()
+          .patch('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId2}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .withBody({...payload, categoryId: categoryId2})
+          .expectStatus(200)
+          .expectBodyContains(payload.link)
+          .expectBodyContains(payload.title)
+      });
+
+      it('should edited the category of bookmark', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId2}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(200)
+          .expectBodyContains('$S{bookmarkId2}')
+          .expectBodyContains('EditedMain')
+          .inspect();
+      });
     });
 
     describe('Delete bookmark', () => {

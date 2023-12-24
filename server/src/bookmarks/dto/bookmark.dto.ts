@@ -16,3 +16,20 @@ export class CreateBookmarkDto {
     @IsOptional()
     categoryId?: number
 }
+
+export class EditBookmarkDto {
+    @IsString()
+    @IsOptional()
+    title?: string
+
+    @IsString()
+    @IsOptional()
+    link?: string
+
+    @IsString()
+    @IsOptional()
+    description?: string
+
+    @IsOptional()
+    categoryId?: number
+}
