@@ -25,4 +25,27 @@ export class BookmarksService {
         })
         return bookmark;
     }
+
+    async getBookmarks(userId: number) {
+        return await this.prisma.bookmarks.findMany({
+            where: {
+                userId
+            }
+        });
+    }
+
+    async getBookmarkDetails(userId: number, id: number) {
+        return await this.prisma.bookmarks.findFirst({
+            where: {
+                id, userId
+            },
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+    }
 }
