@@ -8,5 +8,8 @@ Create bookmarks APP
 - ORM: Prisma.io
 
 # Frontend
-- TBD
+- React
+- Next.js 14
+- Tailwind CSS
+- Shadcn-UI
 
