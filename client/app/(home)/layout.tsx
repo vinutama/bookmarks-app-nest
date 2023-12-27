@@ -1,3 +1,7 @@
+import Footer from "./_components/footer";
+import Navbar from "./_components/navbar";
+
+
 const HomeLayout = ({
     children
 }: {
@@ -5,11 +9,11 @@ const HomeLayout = ({
 }) => {
     return (
         <div className="h-full bg-slate-200">
-            {/** Navbar section here */}
+            <Navbar/>
             <main className="pt-40 pb-20 bg-slate-200">
                 {children}
             </main>
-            {/** Footer section here */}
+            <Footer/>
         </div>
     );
 };
