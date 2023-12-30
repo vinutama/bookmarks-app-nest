@@ -16,7 +16,7 @@ export class OrganizationsController {
 
     @Get()
     getOrganizations(@GetUserLogin('id') userId: string) {
-        return this.organizationService.getOrganizations();
+        return this.organizationService.getOrganizations(userId);
     }
 
     @Get(':organizationId')
