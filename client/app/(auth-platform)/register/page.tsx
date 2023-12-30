@@ -15,23 +15,25 @@ const RegisterPage = () => {
     e.preventDefault();
 
     const response = await fetch('http://localhost:3111/auth/register', {
-      method: "POST",
+      method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         email, password
       })
     });
 
-    console.log(submit)
-
     const data = await response.json();
-    console.log(data);
 
-    await router.push('/login');
+    if (data.access_token) {
+      localStorage.setItem('accessToken', data.access_token);
+    }
+
+   
+    await router.push('/dashboard');
   }
 
   return (
-    <div className="flex pt-40 pb-20 justify-center">
+    <div className="flex justify-center">
       <div className="w-full max-w-xs">
         <h1 className="mb-4 text-3xl font-extrabold">
           Register
@@ -54,7 +56,7 @@ const RegisterPage = () => {
                 Password
                 </label>
             </div>
-            <input onChange={e => setPassword(e.target.value)} className={`shadow appearance-none border ${password == '' ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline`} id="password" type="password" placeholder="******************" required/>
+            <input onChange={e => setPassword(e.target.value)} className={`shadow appearance-none border ${password == '' ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline`} id="password" type="password" placeholder="********" required/>
             <p className={`text-red-500 text-xs italic ${ password == '' ? '' : 'hidden'}`}>Please type a password.</p>
           </div>
           <div className="mb-6">

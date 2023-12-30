@@ -2,12 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { MailQuestion, SquareAsterisk } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { SyntheticEvent, useState } from "react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const router = useRouter();
+  const router = useRouter();
 
 
   const submit = async (e: SyntheticEvent) => {
@@ -21,16 +22,18 @@ const LoginPage = () => {
       })
     });
 
-    console.log(submit)
 
     const data = await response.json();
-    console.log(data);
+    
+    if (data.access_token) {
+      localStorage.setItem('accessToken', data.access_token);
+    };
 
-    // await router.push('/login');
+    await router.push('/dashboard');
   }
 
   return (
-    <div className="flex pt-40 pb-20 justify-center">
+    <div className="flex justify-center">
       <div className="w-full max-w-xs">
       <h1 className="mb-4 text-3xl font-extrabold">
           Login
@@ -43,7 +46,8 @@ const LoginPage = () => {
                 Email
                 </label>
             </div>
-            <input onChange={e => setEmail(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="your@mail.com"/>
+            <input onChange={e => setEmail(e.target.value)} className={`shadow appearance-none border rounded w-full py-2 px-3 ${email == '' ? 'border-red-500' : ''} text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2`} id="email" type="email" placeholder="your@mail.com" aria-required/>
+            <p className={`text-red-500 text-xs italic ${ email == '' ? '' : 'hidden'}`}>Email required.</p>
           </div>
           <div className="mb-6">
             <div className="flex items-center mb-2">
@@ -52,8 +56,8 @@ const LoginPage = () => {
                 Password
                 </label>
             </div>
-            <input onChange={e => setPassword(e.target.value)} className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************"/>
-            <p className="text-red-500 text-xs italic">Please type a password.</p>
+            <input onChange={e => setPassword(e.target.value)} className={`shadow appearance-none border ${password == '' ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline`} id="password" type="password" placeholder="********" required/>
+            <p className={`text-red-500 text-xs italic ${ password == '' ? '' : 'hidden'}`}>Please type a password.</p>
           </div>
           <div className="flex items-center justify-between">
             <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
