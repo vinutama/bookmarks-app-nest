@@ -5,6 +5,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     BookmarksModule, 
     PrismaModule, 
-    ConfigModule.forRoot({isGlobal: true}), CategoriesModule],
+    ConfigModule.forRoot({isGlobal: true}), CategoriesModule, OrganizationsModule],
 })
 export class AppModule {}

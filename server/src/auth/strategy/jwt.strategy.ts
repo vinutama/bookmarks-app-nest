@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JwtGuardKey) {
     }
 
     // this is for returning user info from token
-    async validate(payload: {userId: number, email: string}) {
+    async validate(payload: {userId: string, email: string}) {
         const user = await this.prisma.users.findUnique({where: {id: payload.userId}});
 
         delete user.password;

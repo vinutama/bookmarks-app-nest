@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CategoryDto } from './dto';
 
@@ -6,9 +6,19 @@ import { CategoryDto } from './dto';
 export class CategoriesService {
     constructor(private prisma: PrismaService){}
 
-    async createCategory(userId: number, dto: CategoryDto) {
+    async createCategory(userId: string, dto: CategoryDto) {
+        const organizationUserId = this.prisma.organizations.findUnique({
+            where: {id: dto.organizationId},
+            select: {
+                userId: true
+            }
+        })
+
+        if (userId != String(organizationUserId)) throw new ForbiddenException('Resource denied');
+
+
         const category = await this.prisma.categories.create({
-            data: {...dto, user: {connect: {id: userId}}}
+            data: {name: dto.name, organization: {connect: {id: dto.organizationId}}}
         })
 
         return category;

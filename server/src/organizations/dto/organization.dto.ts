@@ -1,12 +1,8 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class CategoryDto {
-
+export class OrganizationDto {
+    
     @IsString()
     @IsNotEmpty()
     name: string
-
-    @IsString()
-    @IsNotEmpty()
-    organizationId: string
 }

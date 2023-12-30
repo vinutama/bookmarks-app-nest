@@ -10,7 +10,7 @@ export class CategoriesController {
     constructor(private categoryService: CategoriesService){}
 
     @Post()
-    createBookmark(@GetUserLogin('id') userId: number, @Body() dto: CategoryDto) {
+    createBookmark(@GetUserLogin('id') userId: string, @Body() dto: CategoryDto) {
         return this.categoryService.createCategory(userId, dto);
     }
 }

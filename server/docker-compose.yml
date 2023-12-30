@@ -10,6 +10,8 @@ services:
       - POSTGRES_USER=bookmark
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=bookmark-db
+    volumes:
+      - ./sql-script/init-db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - bmknet
   test-db:
@@ -20,6 +22,8 @@ services:
       - POSTGRES_USER=bookmark
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=test-db
+    volumes:
+      - ./sql-script/init-db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - bmknet
 
