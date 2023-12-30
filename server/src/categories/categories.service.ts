@@ -7,14 +7,14 @@ export class CategoriesService {
     constructor(private prisma: PrismaService){}
 
     async createCategory(userId: string, dto: CreateCategoryDto) {
-        const organizationUserId = this.prisma.organizations.findUnique({
+        const organization = await this.prisma.organizations.findUnique({
             where: {id: dto.organizationId},
             select: {
                 userId: true
             }
         })
 
-        if (userId != String(organizationUserId)) throw new ForbiddenException('Resource denied');
+        if (userId != organization.userId) throw new ForbiddenException('Resource denied');
 
 
         const category = await this.prisma.categories.create({
