@@ -31,8 +31,8 @@ export class AuthService {
                 // }
             });
 
-            // gen template organization and category user
-            this.genTemplateUser(user.id);
+            // gen default organization and category user
+            this.genDefaultEntities(user.id);
     
             return this.genToken(user.id, user.email);
         } catch (error) {
@@ -84,7 +84,7 @@ export class AuthService {
         return {access_token: token};
     }
 
-    async genTemplateUser(userId: string) {
+    async genDefaultEntities(userId: string) {
         const organizations = await this.prisma.organizations.create({
             data: {
                 name: 'My Organization',

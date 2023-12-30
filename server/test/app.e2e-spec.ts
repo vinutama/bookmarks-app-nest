@@ -1,10 +1,11 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
-import { CategoryDto } from 'src/categories/dto';
 import { AppModule } from '../src/app.module';
 import { AuthDto } from "../src/auth/dto";
 import { CreateBookmarkDto, EditBookmarkDto } from '../src/bookmarks/dto';
+import { CreateCategoryDto } from '../src/categories/dto';
+import { CreateOrganizationDto } from '../src/organizations/dto';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EditUserDto } from '../src/users/dto/edit-user.dto';
 
@@ -45,7 +46,35 @@ describe('App e2e', () => {
           .post(
             `${URL}/register`
           ).withBody(dto)
-          .expectStatus(201);
+          .expectStatus(201)
+          .stores('userHeaders', 'access_token');
+      });
+
+      it('should create default organization', () => {
+        return pactum
+          .spec()
+          .get('/organizations')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(200)
+          .expectJsonLength(1)
+          .stores('defaultOrganizationId', '[0].id')
+      });
+
+      it('should create default category', async () => {
+        // need to wait 5ms to wait organization created
+        await pactum.sleep(5);
+
+        return pactum
+          .spec()
+          .get('/categories/organization/{id}')
+          .withPathParams('id', '$S{defaultOrganizationId}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(200)
+          .expectJsonLength(1)
       });
     });
 
@@ -57,7 +86,6 @@ describe('App e2e', () => {
             `${URL}/login`
           ).withBody(dto)
           .expectStatus(200)
-          .stores('userHeaders', 'access_token');
       });
     });
   });
@@ -95,11 +123,33 @@ describe('App e2e', () => {
     });
   });
 
+  describe('Organizations', () => {
+    const URL = '/organizations'
+    describe ('Create organization', () => {
+      it('should create organization', () => {
+        const payload: CreateOrganizationDto = {
+          name: 'Test organization'
+        };
+        return pactum
+          .spec()
+          .post(URL)
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .withBody(payload)
+          .expectStatus(201)
+          .expectBodyContains(payload.name)
+          .stores('organizationId', 'id')
+      })
+    })
+  })
+
   describe('Categories', () => {
     describe ('Create category', () => {
       it('should create category', () => {
-        const payload: CategoryDto = {
-          name: 'Main'
+        const payload: CreateCategoryDto = {
+          name: 'Main',
+          organizationId: ''
         };
         return pactum
           .spec()
@@ -107,24 +157,26 @@ describe('App e2e', () => {
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
-          .withBody(payload)
+          .withBody({...payload, organizationId: '$S{organizationId}'})
           .expectStatus(201)
           .expectBodyContains(payload.name)
           .stores('categoryId', 'id')
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('Bookmarks', () => {
+    const URL = '/bookmarks'
     describe('Create bookmark', () => {
       it('create bookmark', () => {
         const payload: CreateBookmarkDto = {
           link: 'https://github.com',
           title: 'Github',
+          categoryId: ''
         };
         return pactum
           .spec()
-          .post('/bookmarks')
+          .post(URL)
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
@@ -134,36 +186,19 @@ describe('App e2e', () => {
           .expectBodyContains(payload.title)
           .stores('bookmarkId', 'id')
       });
-
-      it('create bookmark without category', () => {
-        const payload: CreateBookmarkDto = {
-          link: 'https://github.com',
-          title: 'Github',
-        };
-        return pactum
-          .spec()
-          .post('/bookmarks')
-          .withHeaders({
-            Authorization: 'Bearer $S{userHeaders}'
-          })
-          .withBody(payload)
-          .expectStatus(201)
-          .expectBodyContains(payload.link)
-          .expectBodyContains(payload.title)
-          .stores('bookmarkId2', 'id');
-      });
     });
 
     describe('Get bookmarks', () => {
-      it('should list bookmarks of current user', () => {
+      it('should list bookmarks of current user based on specific category', () => {
         return pactum
           .spec()
-          .get('/bookmarks')
+          .get(`${URL}/category/{id}`)
+          .withPathParams('id', '$S{categoryId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
           .expectStatus(200)
-          .expectJsonLength(2)
+          .expectJsonLength(1)
       });
     });
 
@@ -171,7 +206,7 @@ describe('App e2e', () => {
       it('should get bookmark with category', () => {
         return pactum
           .spec()
-          .get('/bookmarks/{id}')
+          .get(`${URL}/{id}`)
           .withPathParams('id', '$S{bookmarkId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
@@ -180,31 +215,19 @@ describe('App e2e', () => {
           .expectBodyContains('$S{bookmarkId}')
           .expectBodyContains('Main')
       });
-
-      it('should get bookmark without category', () => {
-        return pactum
-          .spec()
-          .get('/bookmarks/{id}')
-          .withPathParams('id', '$S{bookmarkId2}')
-          .withHeaders({
-            Authorization: 'Bearer $S{userHeaders}'
-          })
-          .expectStatus(200)
-          .expectBodyContains('$S{bookmarkId2}')
-          .inspect();
-      });
     });
 
     describe('Edit bookmark', () => {
       it('should edit link and category bookmark', async () => {
-        const payloadCategory: CategoryDto = {
-          name: 'EditedMain'
+        const payloadCategory: CreateCategoryDto = {
+          name: 'EditedMain',
+          organizationId: ''
         };
         const categoryId2 = await pactum.spec().post('/categories')
         .withHeaders({
           Authorization: 'Bearer $S{userHeaders}'
         })
-        .withBody(payloadCategory)
+        .withBody({...payloadCategory, organizationId: '$S{organizationId}'})
         .returns('id');
   
         const payload: EditBookmarkDto = {
@@ -213,8 +236,8 @@ describe('App e2e', () => {
         };
         return pactum
           .spec()
-          .patch('/bookmarks/{id}')
-          .withPathParams('id', '$S{bookmarkId2}')
+          .patch(`${URL}/{id}`)
+          .withPathParams('id', '$S{bookmarkId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
@@ -227,39 +250,39 @@ describe('App e2e', () => {
       it('should edited the category of bookmark', () => {
         return pactum
           .spec()
-          .get('/bookmarks/{id}')
-          .withPathParams('id', '$S{bookmarkId2}')
+          .get(`${URL}/{id}`)
+          .withPathParams('id', '$S{bookmarkId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
           .expectStatus(200)
-          .expectBodyContains('$S{bookmarkId2}')
+          .expectBodyContains('$S{bookmarkId}')
           .expectBodyContains('EditedMain')
-          .inspect();
       });
     });
 
     describe('Delete bookmark', () => {
-      it('delete the bookmark 2', async () => {
+      it('delete the bookmark', async () => {
         return pactum
           .spec()
-          .delete('/bookmarks/{id}')
-          .withPathParams('id', '$S{bookmarkId2}')
+          .delete(`${URL}/{id}`)
+          .withPathParams('id', '$S{bookmarkId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
           .expectStatus(204)
       });
 
-      it('should get only 1 left bookmark', () => {
+      it('should get only 0 left bookmark', () => {
         return pactum
           .spec()
-          .get('/bookmarks')
+          .get(`${URL}/category/{id}`)
+          .withPathParams('id', '$S{categoryId}')
           .withHeaders({
             Authorization: 'Bearer $S{userHeaders}'
           })
           .expectStatus(200)
-          .expectJsonLength(1)
+          .expectJsonLength(0)
       });
     });
   });
