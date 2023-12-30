@@ -140,9 +140,20 @@ describe('App e2e', () => {
           .expectStatus(201)
           .expectBodyContains(payload.name)
           .stores('organizationId', 'id')
-      })
-    })
-  })
+      });
+
+      it('should get organizations', () => {
+        return pactum
+          .spec()
+          .get(URL)
+          .withHeaders({
+            Authorization: 'Bearer $S{userHeaders}'
+          })
+          .expectStatus(200)
+          .expectJsonLength(2)
+      });
+    });
+  });
 
   describe('Categories', () => {
     describe ('Create category', () => {
