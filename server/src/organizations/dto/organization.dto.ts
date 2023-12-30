@@ -1,8 +1,15 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class OrganizationDto {
+export class CreateOrganizationDto {
     
     @IsString()
     @IsNotEmpty()
     name: string
+}
+
+export class EditOrganizationDto {
+
+    @IsString()
+    @IsOptional()
+    name?: string
 }
