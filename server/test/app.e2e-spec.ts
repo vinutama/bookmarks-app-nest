@@ -273,7 +273,7 @@ describe('App e2e', () => {
           .expectStatus(204)
       });
 
-      it('should get only 0 left bookmark', () => {
+      it('should 0 left bookmark on specific category', () => {
         return pactum
           .spec()
           .get(`${URL}/category/{id}`)
