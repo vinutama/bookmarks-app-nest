@@ -5,20 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building, LogOut, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 const Navbar = () => {
     const router = useRouter();
-    const [isDropDownOpen, setDropdown] = useState(false);
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         router.push('/');
     }
-
-    const toogleDropDown = () => {
-        setDropdown(!isDropDownOpen);
-    };
 
     return (
         <div className="fixed Z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
