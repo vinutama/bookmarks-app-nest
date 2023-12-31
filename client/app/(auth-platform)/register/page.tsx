@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ALargeSmall, BadgeInfo, MailQuestion, SquareAsterisk } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SyntheticEvent, useState } from "react";
@@ -63,12 +64,12 @@ const RegisterPage = () => {
             <div className="flex items-center mb-1 font-extrabold">
               <h2 className="mr-1">Personal information</h2>
                 <div className="group relative w-max">
-                    <BadgeInfo/>
-                  <span
-                    className="text-sm pointer-events-none absolute -bottom-6 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100 text-white bg-black inline-block rounded-md"
-                  >
-                    Optional, you can skip this
-                  </span>
+                    <HoverCard>
+                      <HoverCardTrigger><BadgeInfo/></HoverCardTrigger>
+                      <HoverCardContent>
+                        Optional, you can skip this.
+                      </HoverCardContent>
+                    </HoverCard>
                 </div>
             </div>
             <div className="flex items-center mb-2">
