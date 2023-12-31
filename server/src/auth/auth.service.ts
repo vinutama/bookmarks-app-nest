@@ -30,6 +30,9 @@ export class AuthService {
                 //     lastName: true,
                 // }
             });
+
+            // gen default organization and category user
+            this.genDefaultEntities(user.id);
     
             return this.genToken(user.id, user.email);
         } catch (error) {
@@ -69,7 +72,7 @@ export class AuthService {
         throw new ForbiddenException('Wrong password, please check your password again');
     }
 
-    async genToken(userId: number, email: string): Promise<{access_token: string}> {
+    async genToken(userId: string, email: string): Promise<{access_token: string}> {
         const secret = this.config.get('JWT_SECRET');
 
         const token = await this.jwt.signAsync({userId, email}, 
@@ -79,5 +82,21 @@ export class AuthService {
         });
 
         return {access_token: token};
+    }
+
+    async genDefaultEntities(userId: string) {
+        const organizations = await this.prisma.organizations.create({
+            data: {
+                name: 'My Organization',
+                user: {connect: {id: userId}}
+            }
+        });
+
+        await this.prisma.categories.create({
+            data: {
+                name: 'My Category',
+                organization: {connect: {id: organizations.id}}
+            }
+        })
     }
 }

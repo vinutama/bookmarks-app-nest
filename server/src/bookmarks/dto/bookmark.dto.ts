@@ -13,8 +13,9 @@ export class CreateBookmarkDto {
     @IsOptional()
     description?: string
 
-    @IsOptional()
-    categoryId?: number
+    @IsString()
+    @IsNotEmpty()
+    categoryId: string
 }
 
 export class EditBookmarkDto {
@@ -30,6 +31,7 @@ export class EditBookmarkDto {
     @IsOptional()
     description?: string
 
+    @IsString()
     @IsOptional()
-    categoryId?: number
+    categoryId?: string
 }
